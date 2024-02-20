@@ -18,3 +18,4 @@ var/
 .idea/
 *.iml
 .mypy_cache/
+.DS_Store

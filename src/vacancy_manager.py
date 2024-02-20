@@ -123,7 +123,6 @@ class VacancyManagerJSON(VacancyManagerAbstract):
         vacancies_to_keep = [vac for idx, vac in enumerate(vacancies, start=1) if idx not in indexes]
         self._save_vacancies(vacancies_to_keep)
 
-
     @staticmethod
     def compare_salaries(salary1, salary2):
         if salary1 is not None and salary2 is not None:
@@ -147,38 +146,30 @@ class VacancyManagerJSON(VacancyManagerAbstract):
             messages = []  # Используем список для сбора сообщений
 
             # Сравнение минимальных зарплат
-            min_salary_comparison = self.compare_salaries(vacancy1.get('salary_from'), vacancy2.get('salary_from'))
-            if min_salary_comparison:
-                messages.append(
-                    f"Минимальная зарплата в вакансии '{vacancy1['name']}' "
-                    f"{min_salary_comparison} чем в '{vacancy2['name']}'. "
-                )
-            elif vacancy1.get('salary_from') is None and vacancy2.get('salary_from') is None:
+            if vacancy1.get('salary_from') is None and vacancy2.get('salary_from') is None:
                 messages.append("Минимальная зарплата в обеих вакансиях не указана.")
-            elif vacancy1.get('salary_from') or None and vacancy2.get('salary_from') is None:
-                messages.append(
-                    "Сравнение минимальных зарплат отсутствует из-за "
-                    "неполных данных по зарплате в одной или обеих вакансиях."
-                )
+            else:
+                min_salary_comparison = self.compare_salaries(vacancy1.get('salary_from'), vacancy2.get('salary_from'))
+                if min_salary_comparison:
+                    messages.append(f"Минимальная зарплата в вакансии '{vacancy1['name']}' {min_salary_comparison} "
+                                    f"чем в '{vacancy2['name']}'.")
+                else:
+                    messages.append("Сравнение минимальных зарплат отсутствует из-за "
+                                    "неполных данных по зарплате в одной или обеих вакансиях.")
+
             # Сравнение максимальных зарплат
-            max_salary_comparison = self.compare_salaries(vacancy1.get('salary_to'), vacancy2.get('salary_to'))
-            if max_salary_comparison:
-                messages.append(
-                    f"Максимальная зарплата в вакансии '{vacancy1['name']}' "
-                    f"{max_salary_comparison} чем в '{vacancy2['name']}'."
-                )
-            elif vacancy1.get('salary_to') is None and vacancy2.get('salary_to') is None:
+            if vacancy1.get('salary_to') is None and vacancy2.get('salary_to') is None:
                 messages.append("Максимальная зарплата в обеих вакансиях не указана.")
-            elif vacancy1.get('salary_to') is None or vacancy2.get('salary_to') is None:
-                messages.append(
-                    "Сравнение максимальных зарплат отсутствует из-за "
-                    "неполных данных по зарплате в одной или обеих вакансиях."
-                )
+            else:
+                max_salary_comparison = self.compare_salaries(vacancy1.get('salary_to'), vacancy2.get('salary_to'))
+                if max_salary_comparison:
+                    messages.append(f"Максимальная зарплата в вакансии '{vacancy1['name']}' {max_salary_comparison} "
+                                    f"чем в '{vacancy2['name']}'.")
+                else:
+                    messages.append("Сравнение максимальных зарплат отсутствует из-за "
+                                    "неполных данных по зарплате в одной или обеих вакансиях.")
 
-            if not messages:
-                return "Зарплаты в вакансиях не указаны или их невозможно сравнить."
-
-            return '\n'.join(messages)  # Соединяем сообщения переводом строки
+            return '\n'.join(messages) if messages else "Зарплаты в вакансиях не указаны или их невозможно сравнить."
 
         except IndexError:
             return "Одна из указанных вакансий не существует в сохранённом файле."
